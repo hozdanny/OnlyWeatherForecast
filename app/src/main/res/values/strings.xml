@@ -64,4 +64,11 @@
     <!-- menu xml -->
     <string name="action_add_city">Add City</string>
     <string name="action_setting">Setting</string>
+    <string name="action_refresh">Refresh</string>
+
+    <!--main activity fragment-->
+    <string name="default_headline_text">Foshan</string>
+
+    <!-- content provider-->
+    <string name="content_authority">com.hozdanny.onlyweatherforecast</string>
 </resources>
