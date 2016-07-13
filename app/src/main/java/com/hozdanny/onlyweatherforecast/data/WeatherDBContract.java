@@ -74,14 +74,23 @@ public class WeatherDBContract {
         public static long getDateFromUri(Uri uri) {
             return Long.parseLong(uri.getPathSegments().get(2));
         }
+
+        public static Uri buildWeatherLocationWithStartDate(
+                String locationSetting, long startDate) {
+            long normalizedDate = normalizeDate(startDate);
+            return CONTENT_URI.buildUpon().appendPath(locationSetting)
+                    .appendQueryParameter(COLUMN_DATE, Long.toString(normalizedDate)).build();
+        }
     }
 
     public static long normalizeDate(long startDate) {
         // normalize the start date to the beginning of the (UTC) day
         Time time = new Time();
         time.set(startDate);
+
         int julianDay = Time.getJulianDay(startDate, time.gmtoff);
         return time.setJulianDay(julianDay);
     }
+
 
 }

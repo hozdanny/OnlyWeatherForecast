@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by hoz.danny on 7/7/16.
@@ -71,6 +72,7 @@ public class WeatherContentProvider extends ContentProvider {
             }
 
             case WEATHER_WITH_LOCATION: {
+                //weather data is form here.
                 String locationSetting = WeatherDBContract.WeatherEntry.getLocationSettingFromUri(uri);
                 long startDate = WeatherDBContract.WeatherEntry.getStartDateFromUri(uri);
 
@@ -81,6 +83,7 @@ public class WeatherContentProvider extends ContentProvider {
                     selectionArgs = new String[]{locationSetting};
                 } else {
                     //location.location_setting = ? AND date >= ?
+                    selectionArgs = new String[]{locationSetting, Long.toString(startDate)};
                     selection = WeatherDBContract.LocationEntry.TABLE_NAME +
                             "." + WeatherDBContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
                             WeatherDBContract.WeatherEntry.COLUMN_DATE + " >= ? ";
@@ -110,6 +113,7 @@ public class WeatherContentProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
+                break;
             }
 
             case LOCATION: {
@@ -274,8 +278,6 @@ public class WeatherContentProvider extends ContentProvider {
                 return returnCount;
             default:
                 return super.bulkInsert(uri, values);
-
         }
-
     }
 }
