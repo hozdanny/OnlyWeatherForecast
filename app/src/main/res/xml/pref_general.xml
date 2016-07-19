@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditTextPreference
-        android:dialogMessage="请在此输入"
-        android:dialogTitle="请输入你的名字"
-        android:key="edt"
-        android:summary="名字"
-        android:title="请输入" />
-
-    <CheckBoxPreference
+    <SwitchPreference
         android:key="checkbox"
-        android:summaryOff="已经关闭"
-        android:summaryOn="已经打开"
-        android:title="是否打开" />
+        android:summaryOff="@string/pref_notification_unchecked"
+        android:summaryOn="@string/pref_notification_checked"
+        android:title="@string/pref_title_notification" />
 
 </PreferenceScreen>

@@ -92,12 +92,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-//            case R.id.action_refresh:
-//                Log.i(TAG, "refresh clicked.");
-//                FetchWeatherDataTask fetchTask = new FetchWeatherDataTask(getActivity(), locationSetting);
-//                fetchTask.execute();
-//
-//                break;
+
             default:
         }
         return super.onOptionsItemSelected(item);

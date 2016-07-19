@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 /**
  * Created by hoz.danny on 7/7/16.
  */
@@ -56,8 +58,23 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         int defaultImage;
 
         switch (getItemViewType(position)) {
+//            case VIEW_TYPE_TODAY:
+//                defaultImage = Utility.getArtResourceForWeatherCondition(weatherId);
+//                break;
+            default:
+                defaultImage = Utility.getIconResourceForWeatherCondition(weatherId);
+        }
+
+        switch (getItemViewType(position)) {
 
         }
+
+        Glide.with(mContext)
+                .load(Utility.getArtUrlForWeatherCondition(mContext,weatherId))
+                .error(defaultImage)
+                .crossFade()
+                .into(holder.mIconView);
+
 
         // Read date from cursor
         long dateInMillis = mCursor.getLong(ForecastFragment.COL_WEATHER_DATE);

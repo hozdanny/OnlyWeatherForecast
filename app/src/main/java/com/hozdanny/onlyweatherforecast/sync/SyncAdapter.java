@@ -64,7 +64,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         String jsonStr = null;
         String format = "json";
         String units = "metric";
-        int numOfDay = 7;
+        int numOfDay = 15;
         String appID = "0d9fe4f55285434e61c29d4130a2ad82";
 
         try {

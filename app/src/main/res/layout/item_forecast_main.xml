@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/abc_list_item_padding_horizontal_material"
+    android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:nestedScrollingEnabled="true">
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/list_item_icon" />
+        android:layout_height="match_parent"
+        android:id="@+id/list_item_icon"
+        android:layout_marginRight="@dimen/abc_list_item_padding_horizontal_material" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -17,25 +23,44 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="New Text"
-            android:id="@+id/list_item_date_textview" />
+            android:id="@+id/list_item_date_textview"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="New Text"
-            android:id="@+id/list_item_forecast_textview" />
+            android:id="@+id/list_item_forecast_textview"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/secondary_text"
+            android:layout_marginRight="@dimen/forecast_temperature_space" />
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/list_item_high_textview" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="right">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/list_item_low_textview" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/list_item_high_textview"
+            android:textColor="@color/primary_text"
+            android:textSize="@dimen/forecast_text_size"
+            android:layout_gravity="center"
+            android:gravity="right" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/list_item_low_textview"
+            android:textColor="@color/forecast_low_text"
+            android:textSize="@dimen/forecast_text_size"
+            android:layout_gravity="center"
+            android:gravity="right" />
+    </LinearLayout>
 
 </LinearLayout>

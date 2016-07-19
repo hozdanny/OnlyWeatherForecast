@@ -15,4 +15,8 @@
     <dimen name="material_text_display2">45sp</dimen>
     <dimen name="material_text_display3">56sp</dimen>
     <dimen name="material_text_display4">112sp</dimen>
+
+    <dimen name="forecast_text_size">32dp</dimen>
+    <dimen name="forecast_text_width">49dp</dimen>
+    <dimen name="forecast_temperature_space">8dp</dimen>
 </resources>
