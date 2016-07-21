@@ -1,11 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/text1"
+    android:id="@+id/drawer_list_item_text"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceListItemSmall"
-    android:gravity="center_vertical"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:textColor="#fff"
-    android:background="?android:attr/activatedBackgroundIndicator"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall"/>
+    android:background="@drawable/drawer_touch_selector"
+    android:padding="@dimen/abc_list_item_padding_horizontal_material"
+    android:text="New Text"
+    android:textColor="@color/abc_primary_text_disable_only_material_dark"
+    android:textSize="@dimen/design_navigation_icon_size" />

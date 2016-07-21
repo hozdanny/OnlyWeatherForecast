@@ -20,6 +20,7 @@ import android.text.format.Time;
 import android.util.Log;
 
 import com.hozdanny.onlyweatherforecast.R;
+import com.hozdanny.onlyweatherforecast.Utility;
 import com.hozdanny.onlyweatherforecast.data.WeatherDBContract;
 
 import org.json.JSONArray;
@@ -38,15 +39,15 @@ import java.util.Vector;
  * Created by hoz.danny on 7/13/16.
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
-    String mLocationSetting = "foshan";
     private static final String LOG_TAG = SyncAdapter.class.getSimpleName();
-    ContentResolver mContentResolver;
+    private ContentResolver mContentResolver;
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
     public static final int SYNC_INTERVAL = 60 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int WEATHER_NOTIFICATION_ID = 3004;
+    private String location = "london";
 
 
     //constructor
@@ -55,12 +56,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         mContentResolver = context.getContentResolver();
     }
 
+
+
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "Starting sync");
+        String locationQuery = Utility.getPreferredLocation(getContext());
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
+        Log.i(LOG_TAG,"perform sync "+ locationQuery);
         String jsonStr = null;
         String format = "json";
         String units = "metric";
@@ -76,7 +81,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             final String APPID_PARAM = "APPID";
 
             Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .appendQueryParameter(QUERY_PARAM, mLocationSetting)
+                    .appendQueryParameter(QUERY_PARAM, locationQuery)
                     .appendQueryParameter(FORMAT_PARAM, format)
                     .appendQueryParameter(UNITS_PARAM, units)
                     .appendQueryParameter(DAYS_PARAM, Integer.toString(numOfDay))
@@ -177,7 +182,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             JSONObject cityCoord = cityJson.getJSONObject(OWM_COORD);
             double cityLatitude = cityCoord.getDouble(OWM_LATITUDE);
             double cityLongitude = cityCoord.getDouble(OWM_LONGITUDE);
-            long locationId = addLocation(mLocationSetting, cityName, cityLatitude, cityLongitude);
+            long locationId = addLocation(Utility.getPreferredLocation(getContext()), cityName, cityLatitude, cityLongitude);
 
             Vector<ContentValues> cVector = new Vector<ContentValues>(weatherArray.length());
 
@@ -402,4 +407,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         spe.commit();
     }
 
+    public void setLocation(String location){
+        this.location=location;
+    }
 }

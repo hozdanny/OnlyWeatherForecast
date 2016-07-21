@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.hozdanny.onlyweatherforecast.data.WeatherDBContract;
 
@@ -27,7 +28,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final String TAG = ForecastFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private ForecastAdapter mForecasetAdapter;
-    public static final String locationSetting = "foshan";
+    private TextView mLocationText;
 
     private static final int FORECAST_LOADER = 0;
 
@@ -75,12 +76,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_forecast, container, false);
+
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_forecast);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
-
         mForecasetAdapter = new ForecastAdapter(getActivity());
         mRecyclerView.setAdapter(mForecasetAdapter);
+        mLocationText = (TextView)rootView.findViewById(R.id.text_view_city_name);
+
         return rootView;
     }
 
@@ -102,6 +105,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String sortOrder = WeatherDBContract.WeatherEntry.COLUMN_DATE + " ASC";
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+        Log.i(TAG,"fragment title"+ locationSetting);
+        mLocationText.setText(locationSetting);
         Uri weatherForLocationUri = WeatherDBContract.WeatherEntry.buildWeatherLocationWithStartDate(locationSetting, System.currentTimeMillis());
         Log.i(TAG, "Uri " + weatherForLocationUri.toString());
         CursorLoader cursorLoader = new CursorLoader(getActivity(),
@@ -116,11 +122,28 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mForecasetAdapter.swapCursor(data);
-
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mForecasetAdapter.swapCursor(null);
+    }
+
+
+    @Override
+    public void onResume() {
+        Log.i(TAG,"onResume()");
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        Log.i(TAG,"onPause()");
+        super.onPause();
+    }
+
+
+    public void onLocationChanged(){
+        getLoaderManager().restartLoader(FORECAST_LOADER,null,this);
     }
 }

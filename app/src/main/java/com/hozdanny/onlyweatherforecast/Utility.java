@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -329,5 +330,10 @@ public class Utility {
             return R.drawable.ic_cloudy;
         }
         return -1;
+    }
+
+    public static String getPreferredLocation(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.sharedPrefName),context.MODE_PRIVATE);
+        return prefs.getString(context.getString(R.string.pref_location),"london");
     }
 }

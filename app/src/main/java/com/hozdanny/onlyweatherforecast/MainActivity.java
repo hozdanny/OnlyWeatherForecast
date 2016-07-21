@@ -1,65 +1,129 @@
 package com.hozdanny.onlyweatherforecast;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.hozdanny.onlyweatherforecast.sync.SyncAdapter;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+    final static String TAG = MainActivity.class.getSimpleName();
+    private AlertDialog dialog;
+    private ArrayList<String> locationSet;
+    private DrawerListAdapter mDrawerListAdapter;
+    private static final String SELECTED_KEY = "selected_position";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        ListView drawerList = (ListView)findViewById(R.id.drawer_listview);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
-        String[] mPlanetTitles = {"one","two"};
-        drawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, mPlanetTitles));
+        //add location button
+        ImageButton addLocationBtn = (ImageButton) findViewById(R.id.btn_add_location);
+        addLocationBtn.setOnClickListener(this);
 
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout,toolbar ,  R.string.drawer_open, R.string.drawer_close) {
+        //drawer
+        DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ListView mDrawerListView = (ListView) findViewById(R.id.drawer_listview);
+        locationSet = new ArrayList<>();
+        locationSet.add("beijing");
+        locationSet.add("foshan");
+        mDrawerListAdapter = new DrawerListAdapter(this, R.layout.drawer_list_item, locationSet);
+        mDrawerListView.setAdapter(mDrawerListAdapter);
+        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SharedPreferences sp = getSharedPreferences(getString(R.string.sharedPrefName),MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                String location = mDrawerListAdapter.getPositionItem(position);
+                editor.putString(getString(R.string.pref_location),location);
+                editor.commit();
+                Log.i(TAG,"On item click "+ sp.getString(getString(R.string.pref_location),""));
+                view.setSelected(true);
+            }
+        });
+        //open and close drawer listener
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
 
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                //getActionBar().setTitle(mTitle);
-                //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.fragment_forecast));
+                forecastFragment.onLocationChanged();
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                //getActionBar().setTitle(mDrawerTitle);
-                //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+
+
             }
         };
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
         mDrawerToggle.syncState();
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        //add location dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setView(R.layout.dialog_add_location);
+        dialogBuilder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+                Dialog d = (Dialog) dialog;
+                EditText location = (EditText) d.findViewById(R.id.dialog_edittext_location);
+                if (location.getText() != null) {
+                    locationSet.add(location.getText().toString());
+                    mDrawerListAdapter.setLocationSet(locationSet);
+                    location.setText("");
+                    d.dismiss();
+                }
+            }
+        });
+        dialogBuilder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                Dialog d = (Dialog) dialog;
+                EditText location = (EditText) d.findViewById(R.id.dialog_edittext_location);
+                location.setText("");
+            }
+        });
+        dialog = dialogBuilder.create();
+
 
         SyncAdapter.initializeSyncAdapter(this);
+
     }
 
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.btn_add_location:
+                dialog.show();
+                break;
             default:
         }
     }
@@ -83,5 +147,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_location))) {
+            SyncAdapter.syncImmediately(this);
+        }
+    }
 
+    @Override
+    protected void onPause() {
+        SharedPreferences sp = getSharedPreferences(getString(R.string.sharedPrefName),MODE_PRIVATE);
+        sp.unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        SharedPreferences sp = getSharedPreferences(getString(R.string.sharedPrefName),MODE_PRIVATE);
+        sp.registerOnSharedPreferenceChangeListener(this);
+        super.onResume();
+    }
 }
