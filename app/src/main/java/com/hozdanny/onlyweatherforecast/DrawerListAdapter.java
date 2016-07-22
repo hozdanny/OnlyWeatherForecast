@@ -40,5 +40,6 @@ public class DrawerListAdapter extends ArrayAdapter<String> {
 
     public void setLocationSet(ArrayList<String> locationSet){
         this.locationSet = locationSet;
+        notifyDataSetChanged();
     }
 }

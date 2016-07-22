@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<String> locationSet;
     private DrawerListAdapter mDrawerListAdapter;
     private static final String SELECTED_KEY = "selected_position";
+    private ListView mDrawerListView;
+    private Parcelable state = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,22 +51,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //drawer
         DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ListView mDrawerListView = (ListView) findViewById(R.id.drawer_listview);
+        mDrawerListView = (ListView) findViewById(R.id.drawer_listview);
         locationSet = new ArrayList<>();
         locationSet.add("beijing");
         locationSet.add("foshan");
         mDrawerListAdapter = new DrawerListAdapter(this, R.layout.drawer_list_item, locationSet);
+        mDrawerListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         mDrawerListView.setAdapter(mDrawerListAdapter);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                SharedPreferences sp = getSharedPreferences(getString(R.string.sharedPrefName),MODE_PRIVATE);
+                //set sharedPreference location and position
+                SharedPreferences sp = getSharedPreferences(getString(R.string.sharedPrefName), MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
                 String location = mDrawerListAdapter.getPositionItem(position);
-                editor.putString(getString(R.string.pref_location),location);
+                editor.putString(getString(R.string.pref_location), location);
                 editor.commit();
-                Log.i(TAG,"On item click "+ sp.getString(getString(R.string.pref_location),""));
-                view.setSelected(true);
+               // view.setSelected(true);
             }
         });
         //open and close drawer listener
@@ -75,11 +79,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.fragment_forecast));
                 forecastFragment.onLocationChanged();
+                state = mDrawerListView.onSaveInstanceState();
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
-
+                if (state != null) {
+                    mDrawerListView.onRestoreInstanceState(state);
+                }
 
             }
         };
@@ -156,14 +163,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onPause() {
-        SharedPreferences sp = getSharedPreferences(getString(R.string.sharedPrefName),MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(getString(R.string.sharedPrefName), MODE_PRIVATE);
         sp.unregisterOnSharedPreferenceChangeListener(this);
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        SharedPreferences sp = getSharedPreferences(getString(R.string.sharedPrefName),MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(getString(R.string.sharedPrefName), MODE_PRIVATE);
         sp.registerOnSharedPreferenceChangeListener(this);
         super.onResume();
     }

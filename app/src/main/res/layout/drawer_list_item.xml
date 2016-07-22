@@ -3,6 +3,7 @@
     android:id="@+id/drawer_list_item_text"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+
     android:background="@drawable/drawer_touch_selector"
     android:padding="@dimen/abc_list_item_padding_horizontal_material"
     android:text="New Text"
