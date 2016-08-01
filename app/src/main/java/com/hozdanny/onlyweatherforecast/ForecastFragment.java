@@ -1,5 +1,6 @@
 package com.hozdanny.onlyweatherforecast;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.database.Cursor;
 import android.net.Uri;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.util.Util;
 import com.hozdanny.onlyweatherforecast.data.WeatherDBContract;
 
 
@@ -27,7 +29,7 @@ import com.hozdanny.onlyweatherforecast.data.WeatherDBContract;
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = ForecastFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
-    private ForecastAdapter mForecasetAdapter;
+    private ForecastAdapter mForecastAdapter;
     private TextView mLocationText;
 
     private static final int FORECAST_LOADER = 0;
@@ -80,11 +82,24 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_forecast);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
-        mForecasetAdapter = new ForecastAdapter(getActivity());
-        mRecyclerView.setAdapter(mForecasetAdapter);
-        mLocationText = (TextView)rootView.findViewById(R.id.text_view_city_name);
+        mForecastAdapter = new ForecastAdapter(getActivity(), new ForecastAdapter.OnItemClickHandler() {
+            @Override
+            public void onItemClick(long date, ForecastAdapter.ViewHolder vh) {
+                Log.i(TAG, "item clicked "+ date);
+                String location = Utility.getPreferredLocation(getActivity());
+                ((Callback)getActivity()).onItemSelected(WeatherDBContract.WeatherEntry.buildWeatherLocationWithDate(location
+                        , date),vh);
 
+            }
+        });
+        mRecyclerView.setAdapter(mForecastAdapter);
+        mLocationText = (TextView)rootView.findViewById(R.id.text_view_city_name);
         return rootView;
+    }
+
+    //a call back that let main activity implement it to start detail activity
+    public interface Callback {
+        public void onItemSelected(Uri dateUri, ForecastAdapter.ViewHolder vh);
     }
 
     @Override
@@ -121,12 +136,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mForecasetAdapter.swapCursor(data);
+        mForecastAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mForecasetAdapter.swapCursor(null);
+        mForecastAdapter.swapCursor(null);
     }
 
 

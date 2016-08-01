@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.hozdanny.onlyweatherforecast.data.WeatherDBContract;
 
 /**
  * Created by hoz.danny on 7/7/16.
@@ -19,8 +20,9 @@ import com.bumptech.glide.Glide;
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHolder> {
     private Cursor mCursor;
     private Context mContext;
+    private OnItemClickHandler mOnItemClickHandler;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
         public final ImageView mIconView;
         public final TextView mDateView;
@@ -36,11 +38,25 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
             mDescriptionView = (TextView) v.findViewById(R.id.list_item_forecast_textview);
             mHighTempView = (TextView) v.findViewById(R.id.list_item_high_textview);
             mLowTempView = (TextView) v.findViewById(R.id.list_item_low_textview);
+            v.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            mCursor.moveToPosition(position);
+            int dateColumnIndex = mCursor.getColumnIndex(WeatherDBContract.WeatherEntry.COLUMN_DATE);
+            mOnItemClickHandler.onItemClick(mCursor.getLong(dateColumnIndex),this);
         }
     }
 
-    public ForecastAdapter(Context mContext) {
+    public static interface OnItemClickHandler{
+        void onItemClick(long date, ForecastAdapter.ViewHolder vh);
+    }
+
+    public ForecastAdapter(Context mContext,ForecastAdapter.OnItemClickHandler mOnItemClickHandler) {
         this.mContext = mContext;
+        this.mOnItemClickHandler = mOnItemClickHandler;
     }
 
     @Override
@@ -48,6 +64,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_forecast_main, parent, false);
         ViewHolder vh = new ViewHolder(v);
+
         return vh;
     }
 

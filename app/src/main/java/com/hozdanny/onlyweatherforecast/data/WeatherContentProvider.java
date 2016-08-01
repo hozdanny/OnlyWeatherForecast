@@ -105,10 +105,12 @@ public class WeatherContentProvider extends ContentProvider {
                 selection = WeatherDBContract.LocationEntry.TABLE_NAME +
                         "." + WeatherDBContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
                         WeatherDBContract.WeatherEntry.COLUMN_DATE + " = ? ";
+                Log.i("content provider","selection: "+ selection);
+
                 cursor = selectWeatherByLocation.query(mWeatherDBHelper.getReadableDatabase(),
                         projection,
                         selection,
-                        selectionArgs,
+                        new String[]{locationSetting, Long.toString(date)},
                         null,
                         null,
                         sortOrder

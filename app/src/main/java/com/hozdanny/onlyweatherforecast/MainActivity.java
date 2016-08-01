@@ -5,8 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -26,7 +30,7 @@ import com.hozdanny.onlyweatherforecast.sync.SyncAdapter;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener, ForecastFragment.Callback {
     final static String TAG = MainActivity.class.getSimpleName();
     private AlertDialog dialog;
     private ArrayList<String> locationSet;
@@ -48,13 +52,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //add location button
         ImageButton addLocationBtn = (ImageButton) findViewById(R.id.btn_add_location);
         addLocationBtn.setOnClickListener(this);
+        ImageButton addCityBtn = (ImageButton)findViewById(R.id.btn_add_city);
+        addCityBtn.setOnClickListener(this);
 
         //drawer
         DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerListView = (ListView) findViewById(R.id.drawer_listview);
         locationSet = new ArrayList<>();
-        locationSet.add("beijing");
-        locationSet.add("foshan");
+        locationSet.add("Beijing");
+        locationSet.add("Foshan");
         mDrawerListAdapter = new DrawerListAdapter(this, R.layout.drawer_list_item, locationSet);
         mDrawerListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         mDrawerListView.setAdapter(mDrawerListAdapter);
@@ -131,6 +137,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_add_location:
                 dialog.show();
                 break;
+            case R.id.btn_add_city:
+                Intent intent = new Intent(this,SearchActivity.class);
+                startActivity(intent);
+                break;
             default:
         }
     }
@@ -149,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.action_setting:
                 Intent intent = new Intent(this, SettingActivity.class);
                 startActivity(intent);
+                break;
             default:
         }
         return super.onOptionsItemSelected(item);
@@ -173,5 +184,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences sp = getSharedPreferences(getString(R.string.sharedPrefName), MODE_PRIVATE);
         sp.registerOnSharedPreferenceChangeListener(this);
         super.onResume();
+    }
+
+    @Override
+    public void onItemSelected(Uri dateUri, ForecastAdapter.ViewHolder vh) {
+        Log.i(TAG, "on item selected "+ dateUri);
+        Intent intent = new Intent(this, DetailActivity.class)
+                .setData(dateUri);
+        startActivity(intent);
     }
 }
