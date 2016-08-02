@@ -15,9 +15,7 @@ public class TestDB extends AndroidTestCase {
 
 
     public void testCreateDb() throws Throwable {
-        // build a HashSet of all of the table names we wish to look for
-        // Note that there will be another table in the DB that stores the
-        // Android metadata (db version information)
+
         final HashSet<String> tableNameHashSet = new HashSet<String>();
         tableNameHashSet.add(WeatherDBContract.LocationEntry.TABLE_NAME);
         tableNameHashSet.add(WeatherDBContract.WeatherEntry.TABLE_NAME);
@@ -27,23 +25,20 @@ public class TestDB extends AndroidTestCase {
                 this.mContext).getWritableDatabase();
         assertEquals(true, db.isOpen());
 
-        // have we created the tables we want?
+        // tables created?
         Cursor c = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null);
 
         assertTrue("Error: This means that the database has not been created correctly",
                 c.moveToFirst());
 
-        // verify that the tables have been created
         do {
             tableNameHashSet.remove(c.getString(0));
         } while( c.moveToNext() );
 
-        // if this fails, it means that your database doesn't contain both the location entry
-        // and weather entry tables
+
         assertTrue("Error: Your database was created without both the location entry and weather entry tables",
                 tableNameHashSet.isEmpty());
 
-        // now, do our tables contain the correct columns?
         c = db.rawQuery("PRAGMA table_info(" + WeatherDBContract.LocationEntry.TABLE_NAME + ")",
                 null);
 
@@ -64,8 +59,6 @@ public class TestDB extends AndroidTestCase {
             locationColumnHashSet.remove(columnName);
         } while(c.moveToNext());
 
-        // if this fails, it means that your database doesn't contain all of the required location
-        // entry columns
         assertTrue("Error: The database doesn't contain all of the required location entry columns",
                 locationColumnHashSet.isEmpty());
         db.close();
