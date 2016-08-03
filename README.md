@@ -1,7 +1,7 @@
 # OnlyWeatherForecast
 用于展示个人学习成果。<br>
 天气数据来源：http://openweathermap.org<br>
-
+##Change Log
 * Jul 5, 2016   First Commit<br>
 * Jul 6, 2016   添加设置和设置的样式<br>
 * Jul 11, 2016  添加数据源并使用Content Provider存储到数据库<br>
