@@ -23,7 +23,6 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
     private OnItemClickHandler mOnItemClickHandler;
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        // each data item is just a string in this case
         public final ImageView mIconView;
         public final TextView mDateView;
         public final TextView mDescriptionView;
@@ -50,6 +49,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         }
     }
 
+    //a interface for recyclerview item to do onclick action
     public static interface OnItemClickHandler{
         void onItemClick(long date, ForecastAdapter.ViewHolder vh);
     }
@@ -96,32 +96,18 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         // Read date from cursor
         long dateInMillis = mCursor.getLong(ForecastFragment.COL_WEATHER_DATE);
 
-        // Find TextView and set formatted date on it
         holder.mDateView.setText(Utility.getFriendlyDayString(mContext, dateInMillis));
-
-        // Read weather forecast from cursor
         String description = Utility.getStringForWeatherCondition(mContext, weatherId);
-
-        // Find TextView and set weather forecast on it
         holder.mDescriptionView.setText(description);
         holder.mDescriptionView.setContentDescription(mContext.getString(R.string.a11y_forecast, description));
-
-        // For accessibility, we don't want a content description for the icon field
-        // because the information is repeated in the description view and the icon
-        // is not individually selectable
-
-        // Read high temperature from cursor
         double high = mCursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
         String highString = Utility.formatTemperature(mContext, high);
         holder.mHighTempView.setText(highString);
         holder.mHighTempView.setContentDescription(mContext.getString(R.string.a11y_high_temp, highString));
-
-        // Read low temperature from cursor
         double low = mCursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP);
         String lowString = Utility.formatTemperature(mContext, low);
         holder.mLowTempView.setText(lowString);
         holder.mLowTempView.setContentDescription(mContext.getString(R.string.a11y_low_temp, lowString));
-
     }
 
     @Override

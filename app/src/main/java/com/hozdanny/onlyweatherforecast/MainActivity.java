@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AlertDialog dialog;
     private ArrayList<String> locationSet;
     private DrawerListAdapter mDrawerListAdapter;
-    private static final String SELECTED_KEY = "selected_position";
     private ListView mDrawerListView;
     private Parcelable state = null;
 

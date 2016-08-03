@@ -34,13 +34,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private static final int FORECAST_LOADER = 0;
 
+    //projection for date weather forecast in main activity
     private static final String[] FORECAST_COLUMNS = {
-            // In this case the id needs to be fully qualified with a table name, since
-            // the content provider joins the location & weather tables in the background
-            // (both have an _id column)
-            // On the one hand, that's annoying.  On the other, you can search the weather table
-            // using the location set by the user, which is only in the Location table.
-            // So the convenience is worth it.
             WeatherDBContract.WeatherEntry.TABLE_NAME + "." + WeatherDBContract.WeatherEntry._ID,
             WeatherDBContract.WeatherEntry.COLUMN_DATE,
             WeatherDBContract.WeatherEntry.COLUMN_SHORT_DESC,

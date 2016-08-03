@@ -296,9 +296,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
 
-    /**
-     * Helper method to schedule the sync adapter periodic execution
-     */
     public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.content_authority);
@@ -315,10 +312,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    /**
-     * Helper method to have the sync adapter sync immediately
-     * @param context The context used to access the account service
-     */
     public static void syncImmediately(Context context) {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
@@ -327,14 +320,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 context.getString(R.string.content_authority), bundle);
     }
 
-    /**
-     * Helper method to get the fake account to be used with SyncAdapter, or make a new one
-     * if the fake account doesn't exist yet.  If we make a new account, we call the
-     * onAccountCreated method so we can initialize things.
-     *
-     * @param context The context used to access the account service
-     * @return a fake account.
-     */
     public static Account getSyncAccount(Context context) {
         // Get an instance of the Android account manager
         AccountManager accountManager =
@@ -387,18 +372,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         getSyncAccount(context);
     }
 
-    /**
-     * Sets the location status into shared preference.  This function should not be called from
-     * the UI thread because it uses commit to write to the shared preferences.
-     * @param c Context to get the PreferenceManager from.
-    // * @param locationStatus The IntDef value to set
-     */
-//    static private void setLocationStatus(Context c, @LocationStatus int locationStatus){
-//        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-//        SharedPreferences.Editor spe = sp.edit();
-//        spe.putInt(c.getString(R.string.pref_location_status_key), locationStatus);
-//        spe.commit();
-//    }
 
     static private void setLocationStatus(Context c){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);

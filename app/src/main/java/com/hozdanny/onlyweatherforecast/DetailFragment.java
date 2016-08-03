@@ -35,6 +35,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
 
+    //detail cursor projection
     private static final String[] DETAIL_COLUMNS = {
             WeatherDBContract.WeatherEntry.TABLE_NAME + "." + WeatherDBContract.WeatherEntry._ID,
             WeatherDBContract.WeatherEntry.COLUMN_DATE,
@@ -46,13 +47,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WeatherDBContract.WeatherEntry.COLUMN_WIND_SPEED,
             WeatherDBContract.WeatherEntry.COLUMN_DEGREES,
             WeatherDBContract.WeatherEntry.COLUMN_WEATHER_ID,
-            // This works because the WeatherProvider returns location data joined with
-            // weather data, even though they're stored in two different tables.
             WeatherDBContract.LocationEntry.COLUMN_LOCATION_SETTING
     };
 
-    // These indices are tied to DETAIL_COLUMNS.  If DETAIL_COLUMNS changes, these
-    // must change.
     public static final int COL_WEATHER_ID = 0;
     public static final int COL_WEATHER_DATE = 1;
     public static final int COL_WEATHER_DESC = 2;
@@ -75,6 +72,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mWindLabelView;
     private TextView mPressureView;
     private TextView mPressureLabelView;
+
     public DetailFragment() {
         setHasOptionsMenu(true);
     }
@@ -85,9 +83,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Bundle arguments = getArguments();
         if (arguments != null) {
-
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
-            Log.i(TAG,"mUri "+mUri);
+            Log.i(TAG, "mUri " + mUri);
         }
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
@@ -107,12 +104,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (getActivity() instanceof DetailActivity){
-            inflater.inflate(R.menu.menu_fragment_detail,menu);
+        if (getActivity() instanceof DetailActivity) {
+            inflater.inflate(R.menu.menu_fragment_detail, menu);
             MenuItem menuItem = menu.findItem(R.id.action_share);
             menuItem.setIntent(createShareForecastIntent());
         }
     }
+
     private Intent createShareForecastIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
@@ -123,11 +121,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        getLoaderManager().initLoader(DETAIL_LOADER, null,this);
+        getLoaderManager().initLoader(DETAIL_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
-    void onLocationChanged( String newLocation ) {
+    void onLocationChanged(String newLocation) {
         // replace the uri, since the location has changed
         Uri uri = mUri;
         if (null != uri) {
@@ -140,25 +138,25 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (mUri != null){
-            Log.i(TAG,"return a cursor");
-            return new CursorLoader(getActivity(),mUri,DETAIL_COLUMNS,null,null,null);
+        if (mUri != null) {
+            Log.i(TAG, "return a cursor");
+            return new CursorLoader(getActivity(), mUri, DETAIL_COLUMNS, null, null, null);
         }
-        Log.i(TAG,"no cursor");
+        Log.i(TAG, "no cursor");
         return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
-            Log.i(TAG,"cursor has data.");
-            // Read weather condition ID from cursor
+            Log.i(TAG, "cursor has data.");
+
+            // Read weather condition ID
             int weatherId = data.getInt(COL_WEATHER_CONDITION_ID);
 
-            if ( Utility.usingLocalGraphics(getActivity()) ) {
+            if (Utility.usingLocalGraphics(getActivity())) {
                 mIconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
             } else {
-                // Use weather art image
                 Glide.with(this)
                         .load(Utility.getArtUrlForWeatherCondition(getActivity(), weatherId))
                         .error(Utility.getArtResourceForWeatherCondition(weatherId))
@@ -166,9 +164,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         .into(mIconView);
             }
 
-            // Read date from cursor and update views for day of week and date
+            // Read date from cursor
             long date = data.getLong(COL_WEATHER_DATE);
-            String dateText = Utility.getFullFriendlyDayString(getActivity(),date);
+            String dateText = Utility.getFullFriendlyDayString(getActivity(), date);
             mDateView.setText(dateText);
 
             // Get description from weather condition ID
@@ -176,10 +174,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mDescriptionView.setText(description);
             mDescriptionView.setContentDescription(getString(R.string.a11y_forecast, description));
 
-            // For accessibility, add a content description to the icon field. Because the ImageView
-            // is independently focusable, it's better to have a description of the image. Using
-            // null is appropriate when the image is purely decorative or when the image already
-            // has text describing it in the same UI component.
             mIconView.setContentDescription(getString(R.string.a11y_forecast_icon, description));
 
             // Read high temperature from cursor and update view
@@ -190,40 +184,39 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mHighTempView.setText(highString);
             mHighTempView.setContentDescription(getString(R.string.a11y_high_temp, highString));
 
-            // Read low temperature from cursor and update view
+            // Read low temperature from cursor
             double low = data.getDouble(COL_WEATHER_MIN_TEMP);
             String lowString = Utility.formatTemperature(getActivity(), low);
             mLowTempView.setText(lowString);
             mLowTempView.setContentDescription(getString(R.string.a11y_low_temp, lowString));
 
-            // Read humidity from cursor and update view
+            // Read humidity from cursor
             float humidity = data.getFloat(COL_WEATHER_HUMIDITY);
             mHumidityView.setText(getActivity().getString(R.string.format_humidity, humidity));
             mHumidityView.setContentDescription(getString(R.string.a11y_humidity, mHumidityView.getText()));
             mHumidityLabelView.setContentDescription(mHumidityView.getContentDescription());
 
-            // Read wind speed and direction from cursor and update view
+            // Read wind speed and direction from cursor
             float windSpeedStr = data.getFloat(COL_WEATHER_WIND_SPEED);
             float windDirStr = data.getFloat(COL_WEATHER_DEGREES);
             mWindView.setText(Utility.getFormattedWind(getActivity(), windSpeedStr, windDirStr));
             mWindView.setContentDescription(getString(R.string.a11y_wind, mWindView.getText()));
             mWindLabelView.setContentDescription(mWindView.getContentDescription());
 
-            // Read pressure from cursor and update view
+            // Read pressure from cursor
             float pressure = data.getFloat(COL_WEATHER_PRESSURE);
             mPressureView.setText(getString(R.string.format_pressure, pressure));
             mPressureView.setContentDescription(getString(R.string.a11y_pressure, mPressureView.getText()));
             mPressureLabelView.setContentDescription(mPressureView.getContentDescription());
 
-            // We still need this for the share intent
+            // share intent message
             mForecast = String.format("%s - %s - %s/%s", dateText, description, high, low);
 
         }
-        AppCompatActivity activity = (AppCompatActivity)getActivity();
         Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
-        if ( null != toolbarView ) {
+        if (null != toolbarView) {
             Menu menu = toolbarView.getMenu();
-            if ( null != menu ) menu.clear();
+            if (null != menu) menu.clear();
             toolbarView.inflateMenu(R.menu.menu_fragment_detail);
             MenuItem menuItem = menu.findItem(R.id.action_share);
             menuItem.setIntent(createShareForecastIntent());

@@ -29,11 +29,7 @@ public class SyncService extends Service{
             }
         }
     }
-    /**
-     * Return an object that allows the system to invoke
-     * the sync adapter.
-     *
-     */
+
     @Override
     public IBinder onBind(Intent intent) {
         /*

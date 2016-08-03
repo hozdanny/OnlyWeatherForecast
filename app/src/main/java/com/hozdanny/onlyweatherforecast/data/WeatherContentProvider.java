@@ -133,7 +133,7 @@ public class WeatherContentProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        // if you don't call cursor#setNotificationUri(), your cursorLoader will not receive uri change notification.
+        // cursorLoader will receive uri change notification.
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
