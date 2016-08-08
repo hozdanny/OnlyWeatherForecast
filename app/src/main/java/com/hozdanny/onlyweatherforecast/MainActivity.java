@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //add location button
         ImageButton addLocationBtn = (ImageButton) findViewById(R.id.btn_add_location);
         addLocationBtn.setOnClickListener(this);
-        ImageButton addCityBtn = (ImageButton)findViewById(R.id.btn_add_city);
+        ImageButton addCityBtn = (ImageButton) findViewById(R.id.btn_add_city);
         addCityBtn.setOnClickListener(this);
 
         //drawer
@@ -72,13 +72,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String location = mDrawerListAdapter.getPositionItem(position);
                 editor.putString(getString(R.string.pref_location), location);
                 editor.commit();
-               // view.setSelected(true);
+                // view.setSelected(true);
             }
         });
         //open and close drawer listener
         ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
 
-            /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager()
@@ -87,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 state = mDrawerListView.onSaveInstanceState();
             }
 
-            /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 if (state != null) {
                     mDrawerListView.onRestoreInstanceState(state);
@@ -124,9 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         dialog = dialogBuilder.create();
 
-
         SyncAdapter.initializeSyncAdapter(this);
-
     }
 
 
@@ -137,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dialog.show();
                 break;
             case R.id.btn_add_city:
-                Intent intent = new Intent(this,SearchActivity.class);
+                Intent intent = new Intent(this, SearchActivity.class);
                 startActivity(intent);
                 break;
             default:
@@ -187,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onItemSelected(Uri dateUri, ForecastAdapter.ViewHolder vh) {
-        Log.i(TAG, "on item selected "+ dateUri);
+        Log.i(TAG, "on item selected " + dateUri);
         Intent intent = new Intent(this, DetailActivity.class)
                 .setData(dateUri);
         startActivity(intent);

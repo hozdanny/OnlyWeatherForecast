@@ -22,12 +22,16 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
     private Context mContext;
     private OnItemClickHandler mOnItemClickHandler;
 
+    private static final int TODAY_VIEW = 0;
+    private static final int FUTURE_VIEW = 1;
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final ImageView mIconView;
         public final TextView mDateView;
         public final TextView mDescriptionView;
         public final TextView mHighTempView;
         public final TextView mLowTempView;
+        public final TextView mLocationView;
 
 
         public ViewHolder(View v) {
@@ -37,6 +41,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
             mDescriptionView = (TextView) v.findViewById(R.id.list_item_forecast_textview);
             mHighTempView = (TextView) v.findViewById(R.id.list_item_high_textview);
             mLowTempView = (TextView) v.findViewById(R.id.list_item_low_textview);
+            mLocationView = (TextView)v.findViewById(R.id.main_location_textview);
             v.setOnClickListener(this);
         }
 
@@ -45,27 +50,40 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
             int position = getAdapterPosition();
             mCursor.moveToPosition(position);
             int dateColumnIndex = mCursor.getColumnIndex(WeatherDBContract.WeatherEntry.COLUMN_DATE);
-            mOnItemClickHandler.onItemClick(mCursor.getLong(dateColumnIndex),this);
+            mOnItemClickHandler.onItemClick(mCursor.getLong(dateColumnIndex), this);
         }
     }
 
     //a interface for recyclerview item to do onclick action
-    public static interface OnItemClickHandler{
+    public static interface OnItemClickHandler {
         void onItemClick(long date, ForecastAdapter.ViewHolder vh);
     }
 
-    public ForecastAdapter(Context mContext,ForecastAdapter.OnItemClickHandler mOnItemClickHandler) {
+    public ForecastAdapter(Context mContext, ForecastAdapter.OnItemClickHandler mOnItemClickHandler) {
         this.mContext = mContext;
         this.mOnItemClickHandler = mOnItemClickHandler;
     }
 
     @Override
     public ForecastAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_forecast_main, parent, false);
-        ViewHolder vh = new ViewHolder(v);
-
-        return vh;
+        if ( parent instanceof RecyclerView ) {
+            int layoutId = -1;
+            switch (viewType) {
+                case TODAY_VIEW: {
+                    layoutId = R.layout.item_forecast_main_first;
+                    break;
+                }
+                case FUTURE_VIEW: {
+                    layoutId = R.layout.item_forecast_main;
+                    break;
+                }
+            }
+            View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
+            view.setFocusable(true);
+            return new ViewHolder(view);
+        } else {
+            throw new RuntimeException("Not bound to RecyclerView");
+        }
     }
 
     @Override
@@ -75,23 +93,19 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         int defaultImage;
 
         switch (getItemViewType(position)) {
-//            case VIEW_TYPE_TODAY:
-//                defaultImage = Utility.getArtResourceForWeatherCondition(weatherId);
-//                break;
+            case TODAY_VIEW:
+                defaultImage = Utility.getArtResourceForWeatherCondition(weatherId);
+                holder.mIconView.setImageResource(defaultImage);
+                break;
             default:
                 defaultImage = Utility.getIconResourceForWeatherCondition(weatherId);
+                holder.mIconView.setImageResource(defaultImage);
         }
 
-        switch (getItemViewType(position)) {
 
+        if (holder.mLocationView !=null){
+            holder.mLocationView.setText(Utility.getPreferredLocation(mContext));
         }
-
-        Glide.with(mContext)
-                .load(Utility.getArtUrlForWeatherCondition(mContext,weatherId))
-                .error(defaultImage)
-                .crossFade()
-                .into(holder.mIconView);
-
 
         // Read date from cursor
         long dateInMillis = mCursor.getLong(ForecastFragment.COL_WEATHER_DATE);
@@ -112,7 +126,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        if ( null == mCursor ) return 0;
+        if (null == mCursor) return 0;
         return mCursor.getCount();
     }
 
@@ -120,5 +134,10 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ViewHo
         mCursor = newCursor;
         notifyDataSetChanged();
         // mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position == 0 ? TODAY_VIEW : FUTURE_VIEW;
     }
 }

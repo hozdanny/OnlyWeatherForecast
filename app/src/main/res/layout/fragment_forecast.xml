@@ -2,14 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/text_view_city_name"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/abc_action_bar_default_height_material"
-        android:text="@string/default_headline_text"
-        android:textSize="@dimen/material_text_headline"
-        android:gravity="center" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_forecast"
         android:scrollbars="vertical"

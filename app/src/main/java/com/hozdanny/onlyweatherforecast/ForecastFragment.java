@@ -30,7 +30,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final String TAG = ForecastFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private ForecastAdapter mForecastAdapter;
-    private TextView mLocationText;
 
     private static final int FORECAST_LOADER = 0;
 
@@ -88,7 +87,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
         mRecyclerView.setAdapter(mForecastAdapter);
-        mLocationText = (TextView)rootView.findViewById(R.id.text_view_city_name);
         return rootView;
     }
 
@@ -117,7 +115,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         String sortOrder = WeatherDBContract.WeatherEntry.COLUMN_DATE + " ASC";
         String locationSetting = Utility.getPreferredLocation(getActivity());
         Log.i(TAG,"fragment title"+ locationSetting);
-        mLocationText.setText(locationSetting);
         Uri weatherForLocationUri = WeatherDBContract.WeatherEntry.buildWeatherLocationWithStartDate(locationSetting, System.currentTimeMillis());
         Log.i(TAG, "Uri " + weatherForLocationUri.toString());
         CursorLoader cursorLoader = new CursorLoader(getActivity(),

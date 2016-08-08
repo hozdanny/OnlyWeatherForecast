@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +18,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,7 +31,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private Uri mUri;
     private static final int DETAIL_LOADER = 0;
 
-    private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
+    private static final String FORECAST_SHARE_HASHTAG = " #OnlyWeatherForecast";
 
     //detail cursor projection
     private static final String[] DETAIL_COLUMNS = {
@@ -173,10 +171,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             String description = Utility.getStringForWeatherCondition(getActivity(), weatherId);
             mDescriptionView.setText(description);
             mDescriptionView.setContentDescription(getString(R.string.a11y_forecast, description));
-
             mIconView.setContentDescription(getString(R.string.a11y_forecast_icon, description));
 
-            // Read high temperature from cursor and update view
+            // Read high temperature from cursor
             boolean isMetric = Utility.isMetric(getActivity());
 
             double high = data.getDouble(COL_WEATHER_MAX_TEMP);
